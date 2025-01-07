@@ -1,0 +1,59 @@
+version: "3"
+services:
+  frontend:
+    build:
+      context: ./ecommerce-frontend
+    ports:
+      - "3000:3000"
+    depends_on:
+      - api-gateway
+    networks:
+      - ecommerce-network
+
+  api-gateway:
+    image: api-gateway:latest
+    ports:
+      - "8000:80"
+    environment:
+      - ORDER_SERVICE_URL=http://order-service:8001
+      - INVENTORY_SERVICE_URL=http://inventory-service:8002
+      - NOTIFICATION_SERVICE_URL=http://notification-service:8003
+      - AUTH_SERVICE_URL=http://auth-service:8004
+    networks:
+      - ecommerce-network
+
+  auth-service:
+    build:
+      context: ./auth-service
+    ports:
+      - "8004:80"
+    networks:
+      - ecommerce-network
+
+  order-service:
+    build:
+      context: ./order-service
+    ports:
+      - "8001:80"
+    networks:
+      - ecommerce-network
+
+  inventory-service:
+    build:
+      context: ./inventory-service
+    ports:
+      - "8002:80"
+    networks:
+      - ecommerce-network
+
+  notification-service:
+    build:
+      context: ./notification-service
+    ports:
+      - "8003:80"
+    networks:
+      - ecommerce-network
+
+networks:
+  ecommerce-network:
+    driver: bridge
